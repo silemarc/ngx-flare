@@ -1,5 +1,5 @@
-import { Component, ViewChild, ElementRef, AfterViewInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { FlarePlayer } from './flare-player';
+import {AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
+import {FlarePlayer} from './flare-player';
 
 @Component({
   selector: 'ngx-flare',
@@ -20,6 +20,12 @@ export class NgxFlareComponent implements OnChanges, AfterViewInit {
 
   @Input()
   playing = true;
+  loaded = false;
+  example: FlarePlayer;
+
+  get playPosition() {
+    return this.example.getPosition();
+  }
 
   @Input()
   set playPosition(position: number) {
@@ -27,25 +33,25 @@ export class NgxFlareComponent implements OnChanges, AfterViewInit {
       this.example.setPosition(position);
     }
   }
-  get playPosition() {
-    return this.example.getPosition();
+
+  ngAfterViewInit() {
+    this.initializePlayer();
   }
-
-  loaded = false;
-  example: FlarePlayer;
-
-  ngAfterViewInit() { }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.source || changes.animation) {
       if (this.example) {
         this.example.reset();
+
+        if (changes.playing) {
+          this.playing ? this.example.play() : this.example.pause();
+        }
       }
-      this.initializePlayer();
+      if (this.canvas) {
+        this.initializePlayer();
+      }
     }
-    if (changes.playing) {
-      this.playing ? this.example.play() : this.example.pause();
-    }
+
   }
 
   initializePlayer() {
